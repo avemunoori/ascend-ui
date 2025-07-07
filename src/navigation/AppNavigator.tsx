@@ -14,6 +14,7 @@ import AddSessionScreen from '../screens/AddSessionScreen';
 import SessionDetailScreen from '../screens/SessionDetailScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import WeatherScreen from '../screens/WeatherScreen';
 
 // Types
 import { RootStackParamList, MainTabParamList } from '../types';
@@ -36,6 +37,8 @@ const MainTabNavigator: React.FC = () => {
             iconEmoji = focused ? '📊' : '📈';
           } else if (route.name === 'Profile') {
             iconEmoji = focused ? '👤' : '👤';
+          } else if (route.name === 'Weather') {
+            iconEmoji = focused ? '🌤️' : '🌤️';
           } else {
             iconEmoji = '●';
           }
@@ -113,6 +116,14 @@ const MainTabNavigator: React.FC = () => {
         options={{
           title: 'Profile',
           headerTitle: 'My Profile',
+        }}
+      />
+      <Tab.Screen
+        name="Weather"
+        component={WeatherScreen}
+        options={{
+          title: 'Weather',
+          headerTitle: 'Climbing Weather',
         }}
       />
     </Tab.Navigator>

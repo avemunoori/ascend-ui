@@ -116,6 +116,7 @@ export type RootStackParamList = {
   EditSession: { session: Session };
   Analytics: undefined;
   Profile: undefined;
+  Weather: undefined;
 };
 
 export type MainTabParamList = {
@@ -123,4 +124,5 @@ export type MainTabParamList = {
   Add: undefined;
   Analytics: undefined;
   Profile: undefined;
+  Weather: undefined;
 }; 
