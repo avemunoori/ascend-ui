@@ -292,11 +292,7 @@ const SessionsScreen: React.FC = () => {
                    activeOpacity={0.8}
                  >
                    <Card style={styles.sessionCard}>
-                     <LinearGradient
-                       colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-                       style={styles.cardGradient}
-                     >
-                       <Card.Content style={styles.cardContent}>
+                     <Card.Content style={styles.cardContent}>
                          <View style={styles.cardHeader}>
                            <View style={styles.cardTitleContainer}>
                              <Title style={styles.cardTitle}>{session.grade}</Title>
@@ -360,7 +356,6 @@ const SessionsScreen: React.FC = () => {
                            </Paragraph>
                          )}
                        </Card.Content>
-                     </LinearGradient>
                    </Card>
                  </TouchableOpacity>
               </Animated.View>
@@ -472,16 +467,14 @@ const styles = StyleSheet.create({
   },
   sessionCard: {
     borderRadius: 20,
-    elevation: 12,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  cardGradient: {
-    borderRadius: 20,
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
+    overflow: 'hidden',
   },
   cardContent: {
     padding: 20,

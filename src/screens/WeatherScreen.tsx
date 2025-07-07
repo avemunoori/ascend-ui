@@ -185,66 +185,56 @@ const WeatherScreen: React.FC = () => {
 
           {/* Search Section */}
           <Card style={styles.searchCard}>
-            <LinearGradient
-              colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-              style={styles.cardGradient}
-            >
-              <Card.Content style={styles.searchContent}>
-                <Title style={styles.searchTitle}>📍 Search Location</Title>
-                <View style={styles.searchRow}>
-                  <TextInput
-                    placeholder="Enter city name..."
-                    value={location}
-                    onChangeText={setLocation}
-                    style={styles.searchInput}
-                    mode="outlined"
-                    outlineColor="rgba(255, 255, 255, 0.3)"
-                    activeOutlineColor="white"
-                    theme={{
-                      colors: {
-                        placeholder: 'rgba(255, 255, 255, 0.7)',
-                        text: 'white',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                      },
-                    }}
-                  />
-                  <Button
-                    mode="contained"
-                    onPress={searchWeather}
-                    disabled={loading}
-                    style={styles.searchButton}
-                    buttonColor="white"
-                    textColor={colors.primary}
-                  >
-                    Search
-                  </Button>
-                </View>
-                <Button
+            <Card.Content style={styles.searchContent}>
+              <Title style={styles.searchTitle}>📍 Search Location</Title>
+              <View style={styles.searchRow}>
+                <TextInput
+                  placeholder="Enter city name..."
+                  value={location}
+                  onChangeText={setLocation}
+                  style={styles.searchInput}
                   mode="outlined"
-                  onPress={getCurrentLocation}
+                  outlineColor="rgba(255, 255, 255, 0.3)"
+                  activeOutlineColor="white"
+                  theme={{
+                    colors: {
+                      placeholder: 'rgba(255, 255, 255, 0.7)',
+                      text: 'white',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                />
+                <Button
+                  mode="contained"
+                  onPress={searchWeather}
                   disabled={loading}
-                  style={styles.locationButton}
-                  textColor="white"
-                  labelStyle={{ color: 'white' }}
+                  style={styles.searchButton}
+                  buttonColor="white"
+                  textColor={colors.primary}
                 >
-                  📍 Use Current Location
+                  Search
                 </Button>
-              </Card.Content>
-            </LinearGradient>
+              </View>
+              <Button
+                mode="outlined"
+                onPress={getCurrentLocation}
+                disabled={loading}
+                style={styles.locationButton}
+                textColor="white"
+                labelStyle={{ color: 'white' }}
+              >
+                📍 Use Current Location
+              </Button>
+            </Card.Content>
           </Card>
 
           {/* Loading State */}
           {loading && (
             <Card style={styles.loadingCard}>
-              <LinearGradient
-                colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-                style={styles.cardGradient}
-              >
-                <Card.Content style={styles.loadingContent}>
-                  <ActivityIndicator size="large" color="white" />
-                  <Text style={styles.loadingText}>Getting weather data...</Text>
-                </Card.Content>
-              </LinearGradient>
+              <Card.Content style={styles.loadingContent}>
+                <ActivityIndicator size="large" color="white" />
+                <Text style={styles.loadingText}>Getting weather data...</Text>
+              </Card.Content>
             </Card>
           )}
 
@@ -253,107 +243,97 @@ const WeatherScreen: React.FC = () => {
             <>
               {/* Current Location */}
               <Card style={styles.weatherCard}>
-                <LinearGradient
-                  colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-                  style={styles.cardGradient}
-                >
-                  <Card.Content style={styles.weatherContent}>
-                    <View style={styles.locationHeader}>
-                      <Text style={styles.locationIcon}>📍</Text>
-                      <Title style={styles.locationTitle}>{currentLocation}</Title>
-                    </View>
+                <Card.Content style={styles.weatherContent}>
+                  <View style={styles.locationHeader}>
+                    <Text style={styles.locationIcon}>📍</Text>
+                    <Title style={styles.locationTitle}>{currentLocation}</Title>
+                  </View>
 
-                    {/* Main Weather Display */}
-                    <View style={styles.mainWeather}>
-                      <Animated.View style={[styles.weatherIcon, { transform: [{ scale: pulseAnim }] }]}>
-                        <Text style={styles.weatherEmoji}>
-                          {getWeatherIcon(weatherData.icon)}
-                        </Text>
-                      </Animated.View>
-                      <View style={styles.temperatureContainer}>
-                        <Text style={styles.temperature}>
-                          {Math.round(weatherData.temperature)}°C
-                        </Text>
-                        <Text style={styles.description}>
-                          {weatherData.description}
-                        </Text>
-                      </View>
+                  {/* Main Weather Display */}
+                  <View style={styles.mainWeather}>
+                    <Animated.View style={[styles.weatherIcon, { transform: [{ scale: pulseAnim }] }]}>
+                      <Text style={styles.weatherEmoji}>
+                        {getWeatherIcon(weatherData.icon)}
+                      </Text>
+                    </Animated.View>
+                    <View style={styles.temperatureContainer}>
+                      <Text style={styles.temperature}>
+                        {Math.round(weatherData.temperature)}°C
+                      </Text>
+                      <Text style={styles.description}>
+                        {weatherData.description}
+                      </Text>
                     </View>
+                  </View>
 
-                    {/* Climbing Recommendation */}
-                    <View style={styles.recommendationContainer}>
-                      <Chip
-                        mode="outlined"
-                        style={[
-                          styles.recommendationChip,
-                          { borderColor: getConditionColor(weatherData.isGoodForClimbing) }
-                        ]}
-                        textStyle={[
-                          styles.recommendationText,
-                          { color: getConditionColor(weatherData.isGoodForClimbing) }
-                        ]}
-                      >
-                        {weatherData.isGoodForClimbing ? '✅' : '⚠️'} {weatherData.climbingRecommendation}
-                      </Chip>
-                    </View>
+                  {/* Climbing Recommendation */}
+                  <View style={styles.recommendationContainer}>
+                    <Chip
+                      mode="outlined"
+                      style={[
+                        styles.recommendationChip,
+                        { borderColor: getConditionColor(weatherData.isGoodForClimbing) }
+                      ]}
+                      textStyle={[
+                        styles.recommendationText,
+                        { color: getConditionColor(weatherData.isGoodForClimbing) }
+                      ]}
+                    >
+                      {weatherData.isGoodForClimbing ? '✅' : '⚠️'} {weatherData.climbingRecommendation}
+                    </Chip>
+                  </View>
 
-                    {/* Weather Details */}
-                    <View style={styles.weatherDetails}>
-                      <View style={styles.detailItem}>
-                        <Text style={styles.detailLabel}>Feels Like</Text>
-                        <Text style={styles.detailValue}>
-                          {Math.round(weatherData.feelsLike)}°C
-                        </Text>
-                      </View>
-                      <View style={styles.detailItem}>
-                        <Text style={styles.detailLabel}>Humidity</Text>
-                        <Text style={styles.detailValue}>
-                          {weatherData.humidity}%
-                        </Text>
-                      </View>
-                      <View style={styles.detailItem}>
-                        <Text style={styles.detailLabel}>Wind Speed</Text>
-                        <Text style={styles.detailValue}>
-                          {weatherData.windSpeed} km/h
-                        </Text>
-                      </View>
+                  {/* Weather Details */}
+                  <View style={styles.weatherDetails}>
+                    <View style={styles.detailItem}>
+                      <Text style={styles.detailLabel}>Feels Like</Text>
+                      <Text style={styles.detailValue}>
+                        {Math.round(weatherData.feelsLike)}°C
+                      </Text>
                     </View>
-                  </Card.Content>
-                </LinearGradient>
+                    <View style={styles.detailItem}>
+                      <Text style={styles.detailLabel}>Humidity</Text>
+                      <Text style={styles.detailValue}>
+                        {weatherData.humidity}%
+                      </Text>
+                    </View>
+                    <View style={styles.detailItem}>
+                      <Text style={styles.detailLabel}>Wind Speed</Text>
+                      <Text style={styles.detailValue}>
+                        {weatherData.windSpeed} km/h
+                      </Text>
+                    </View>
+                  </View>
+                </Card.Content>
               </Card>
 
               {/* Climbing Tips */}
               <Card style={styles.tipsCard}>
-                <LinearGradient
-                  colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-                  style={styles.cardGradient}
-                >
-                  <Card.Content style={styles.tipsContent}>
-                    <Title style={styles.tipsTitle}>🧗‍♀️ Climbing Tips</Title>
-                    <View style={styles.tipsList}>
-                      <Text style={styles.tipText}>
-                        • {weatherData.isGoodForClimbing 
-                          ? 'Perfect conditions! Consider outdoor climbing today.'
-                          : 'Consider indoor climbing or wait for better conditions.'
-                        }
-                      </Text>
-                      <Text style={styles.tipText}>
-                        • {weatherData.temperature < 15 
-                          ? 'Bring warm layers and consider warming up indoors first.'
-                          : weatherData.temperature > 25
-                          ? 'Stay hydrated and take frequent breaks in the shade.'
-                          : 'Temperature is ideal for climbing!'
-                        }
-                      </Text>
-                      <Text style={styles.tipText}>
-                        • {weatherData.humidity > 60 
-                          ? 'High humidity may affect grip. Consider chalk or different holds.'
-                          : 'Low humidity is great for grip!'
-                        }
-                      </Text>
-                    </View>
-                  </Card.Content>
-                </LinearGradient>
+                <Card.Content style={styles.tipsContent}>
+                  <Title style={styles.tipsTitle}>🧗‍♀️ Climbing Tips</Title>
+                  <View style={styles.tipsList}>
+                    <Text style={styles.tipText}>
+                      • {weatherData.isGoodForClimbing 
+                        ? 'Perfect conditions! Consider outdoor climbing today.'
+                        : 'Consider indoor climbing or wait for better conditions.'
+                      }
+                    </Text>
+                    <Text style={styles.tipText}>
+                      • {weatherData.temperature < 15 
+                        ? 'Bring warm layers and consider warming up indoors first.'
+                        : weatherData.temperature > 25
+                        ? 'Stay hydrated and take frequent breaks in the shade.'
+                        : 'Temperature is ideal for climbing!'
+                      }
+                    </Text>
+                    <Text style={styles.tipText}>
+                      • {weatherData.humidity > 60 
+                        ? 'High humidity may affect grip. Consider chalk or different holds.'
+                        : 'Low humidity is great for grip!'
+                      }
+                    </Text>
+                  </View>
+                </Card.Content>
               </Card>
             </>
           )}
@@ -408,14 +388,15 @@ const styles = StyleSheet.create({
   },
   searchCard: {
     marginBottom: 24,
-    elevation: 8,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
     overflow: 'hidden',
-  },
-  cardGradient: {
-    borderRadius: 16,
   },
   searchContent: {
     padding: 24,
@@ -449,10 +430,14 @@ const styles = StyleSheet.create({
   },
   loadingCard: {
     marginBottom: 24,
-    elevation: 8,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
     overflow: 'hidden',
   },
   loadingContent: {
@@ -467,10 +452,14 @@ const styles = StyleSheet.create({
   },
   weatherCard: {
     marginBottom: 24,
-    elevation: 8,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
     overflow: 'hidden',
   },
   weatherContent: {
@@ -553,10 +542,14 @@ const styles = StyleSheet.create({
   },
   tipsCard: {
     marginBottom: 24,
-    elevation: 8,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
     overflow: 'hidden',
   },
   tipsContent: {

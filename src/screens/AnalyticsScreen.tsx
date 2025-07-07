@@ -100,28 +100,23 @@ const AnalyticsScreen: React.FC = () => {
 
     return (
       <Card style={styles.card}>
-        <LinearGradient
-          colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-          style={styles.cardGradient}
-        >
-          <Card.Content>
-            <Title style={styles.cardTitle}>📊 Overview</Title>
-            <View style={styles.overviewGrid}>
-              <View style={styles.overviewItem}>
-                <Text style={styles.overviewNumber}>{analytics.totalSessions}</Text>
-                <Text style={styles.overviewLabel}>Total Sessions</Text>
-              </View>
-              <View style={styles.overviewItem}>
-                <Text style={styles.overviewNumber}>{formatGrade(analytics.averageDifficulty)}</Text>
-                <Text style={styles.overviewLabel}>Avg Difficulty</Text>
-              </View>
-              <View style={styles.overviewItem}>
-                <Text style={styles.overviewNumber}>{(analytics.sentPercentage * 100).toFixed(1)}%</Text>
-                <Text style={styles.overviewLabel}>Sent Rate</Text>
-              </View>
+        <Card.Content>
+          <Title style={styles.cardTitle}>📊 Overview</Title>
+          <View style={styles.overviewGrid}>
+            <View style={styles.overviewItem}>
+              <Text style={styles.overviewNumber}>{analytics.totalSessions}</Text>
+              <Text style={styles.overviewLabel}>Total Sessions</Text>
             </View>
-          </Card.Content>
-        </LinearGradient>
+            <View style={styles.overviewItem}>
+              <Text style={styles.overviewNumber}>{formatGrade(analytics.averageDifficulty)}</Text>
+              <Text style={styles.overviewLabel}>Avg Difficulty</Text>
+            </View>
+            <View style={styles.overviewItem}>
+              <Text style={styles.overviewNumber}>{(analytics.sentPercentage * 100).toFixed(1)}%</Text>
+              <Text style={styles.overviewLabel}>Sent Rate</Text>
+            </View>
+          </View>
+        </Card.Content>
       </Card>
     );
   };
@@ -131,31 +126,26 @@ const AnalyticsScreen: React.FC = () => {
 
     return (
       <Card style={styles.card}>
-        <LinearGradient
-          colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-          style={styles.cardGradient}
-        >
-          <Card.Content>
-            <Title style={styles.cardTitle}>🧗‍♀️ Sessions by Discipline</Title>
-            {Object.entries(analytics.sessionsByDiscipline).map(([discipline, count]) => (
-              <View key={discipline} style={styles.disciplineRow}>
-                <View style={styles.disciplineInfo}>
-                  <Chip
-                    mode="outlined"
-                    style={[styles.disciplineChip, { borderColor: getDisciplineColor(discipline as SessionDiscipline) }]}
-                    textStyle={{ color: getDisciplineColor(discipline as SessionDiscipline) }}
-                  >
-                    {getDisciplineLabel(discipline as SessionDiscipline)}
-                  </Chip>
-                  <Text style={styles.disciplineCount}>{count} sessions</Text>
-                </View>
-                <Text style={styles.disciplinePercentage}>
-                  {((count / analytics.totalSessions) * 100).toFixed(1)}%
-                </Text>
+        <Card.Content>
+          <Title style={styles.cardTitle}>🧗‍♀️ Sessions by Discipline</Title>
+          {Object.entries(analytics.sessionsByDiscipline).map(([discipline, count]) => (
+            <View key={discipline} style={styles.disciplineRow}>
+              <View style={styles.disciplineInfo}>
+                <Chip
+                  mode="outlined"
+                  style={[styles.disciplineChip, { borderColor: getDisciplineColor(discipline as SessionDiscipline) }]}
+                  textStyle={{ color: getDisciplineColor(discipline as SessionDiscipline) }}
+                >
+                  {getDisciplineLabel(discipline as SessionDiscipline)}
+                </Chip>
+                <Text style={styles.disciplineCount}>{count} sessions</Text>
               </View>
-            ))}
-          </Card.Content>
-        </LinearGradient>
+              <Text style={styles.disciplinePercentage}>
+                {((count / analytics.totalSessions) * 100).toFixed(1)}%
+              </Text>
+            </View>
+          ))}
+        </Card.Content>
       </Card>
     );
   };
@@ -243,40 +233,35 @@ const AnalyticsScreen: React.FC = () => {
 
     return (
       <Card style={styles.card}>
-        <LinearGradient
-          colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-          style={styles.cardGradient}
-        >
-          <Card.Content>
-            <Title style={styles.cardTitle}>📈 Progress Insights</Title>
-            <View style={styles.progressGrid}>
-              <View style={styles.progressItem}>
-                <Text style={styles.progressNumber}>{progressAnalytics.totalSessions}</Text>
-                <Text style={styles.progressLabel}>Total Sessions</Text>
-              </View>
-              <View style={styles.progressItem}>
-                <Text style={styles.progressNumber}>{(progressAnalytics.sentRate * 100).toFixed(1)}%</Text>
-                <Text style={styles.progressLabel}>Success Rate</Text>
-              </View>
-              <View style={styles.progressItem}>
-                <Text style={styles.progressNumber}>{formatGrade(progressAnalytics.avgDifficulty)}</Text>
-                <Text style={styles.progressLabel}>Avg Difficulty</Text>
-              </View>
+        <Card.Content>
+          <Title style={styles.cardTitle}>📈 Progress Insights</Title>
+          <View style={styles.progressGrid}>
+            <View style={styles.progressItem}>
+              <Text style={styles.progressNumber}>{progressAnalytics.totalSessions}</Text>
+              <Text style={styles.progressLabel}>Total Sessions</Text>
             </View>
-            
-            {/* Progress Motivation */}
-            <View style={styles.motivationContainer}>
-              <Text style={styles.motivationText}>
-                {progressAnalytics.sentRate > 0.7 
-                  ? "🔥 You're crushing it! Keep pushing your limits!"
-                  : progressAnalytics.sentRate > 0.5
-                  ? "💪 Great progress! Focus on technique and consistency."
-                  : "🎯 Every session counts! Focus on fundamentals and build confidence."
-                }
-              </Text>
+            <View style={styles.progressItem}>
+              <Text style={styles.progressNumber}>{(progressAnalytics.sentRate * 100).toFixed(1)}%</Text>
+              <Text style={styles.progressLabel}>Success Rate</Text>
             </View>
-          </Card.Content>
-        </LinearGradient>
+            <View style={styles.progressItem}>
+              <Text style={styles.progressNumber}>{formatGrade(progressAnalytics.avgDifficulty)}</Text>
+              <Text style={styles.progressLabel}>Avg Difficulty</Text>
+            </View>
+          </View>
+          
+          {/* Progress Motivation */}
+          <View style={styles.motivationContainer}>
+            <Text style={styles.motivationText}>
+              {progressAnalytics.sentRate > 0.7 
+                ? "🔥 You're crushing it! Keep pushing your limits!"
+                : progressAnalytics.sentRate > 0.5
+                ? "💪 Great progress! Focus on technique and consistency."
+                : "🎯 Every session counts! Focus on fundamentals and build confidence."
+              }
+            </Text>
+          </View>
+        </Card.Content>
       </Card>
     );
   };
@@ -363,13 +348,18 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 16,
-    elevation: 8,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 8 },
+    overflow: 'hidden',
   },
   cardGradient: {
-    borderRadius: 16,
+    display: 'none',
   },
   cardTitle: {
     fontSize: 20,
