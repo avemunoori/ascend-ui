@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BACKEND_API_URL } from '@env';
 import {
   User,
   LoginRequest,
@@ -14,7 +15,7 @@ import {
 } from '../types';
 
 class ApiService {
-  private baseUrl = 'https://ascend-api-production.up.railway.app';
+  private baseUrl = BACKEND_API_URL;
   
   private async getHeaders(): Promise<HeadersInit> {
     const token = await AsyncStorage.getItem('jwt_token');

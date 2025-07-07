@@ -132,18 +132,19 @@ const WeatherScreen: React.FC = () => {
   };
 
   const getWeatherIcon = (iconCode: string) => {
-    const iconMap: { [key: string]: string } = {
-      '01d': '☀️', '01n': '🌙',
-      '02d': '⛅', '02n': '☁️',
-      '03d': '☁️', '03n': '☁️',
-      '04d': '☁️', '04n': '☁️',
-      '09d': '🌧️', '09n': '🌧️',
-      '10d': '🌦️', '10n': '🌧️',
-      '11d': '⛈️', '11n': '⛈️',
-      '13d': '❄️', '13n': '❄️',
-      '50d': '🌫️', '50n': '🌫️',
-    };
-    return iconMap[iconCode] || '🌤️';
+    // WeatherAPI.com icon codes are URLs, we'll extract the condition from the description
+    const description = weatherData?.description.toLowerCase() || '';
+    
+    if (description.includes('sunny') || description.includes('clear')) return '☀️';
+    if (description.includes('partly cloudy')) return '⛅';
+    if (description.includes('cloudy') || description.includes('overcast')) return '☁️';
+    if (description.includes('rain') || description.includes('drizzle')) return '🌧️';
+    if (description.includes('snow')) return '❄️';
+    if (description.includes('thunder') || description.includes('storm')) return '⛈️';
+    if (description.includes('fog') || description.includes('mist')) return '🌫️';
+    if (description.includes('sleet')) return '🌨️';
+    
+    return '🌤️';
   };
 
   const getConditionColor = (isGood: boolean) => {

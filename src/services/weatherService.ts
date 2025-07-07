@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { WEATHER_API_KEY, WEATHER_API_BASE_URL } from '@env';
 
-// OpenWeatherMap API - Free tier allows 1000 calls/day
-const API_KEY = 'YOUR_API_KEY'; // You'll need to get this from openweathermap.org
-const BASE_URL = 'https://api.openweathermap.org/data/2.5';
+// WeatherAPI.com - Free tier allows 1,000,000 calls/month
+const API_KEY = WEATHER_API_KEY;
+const BASE_URL = WEATHER_API_BASE_URL;
 
 export interface WeatherData {
   temperature: number;
@@ -26,15 +27,18 @@ class WeatherService {
   private async getWeatherData(lat: number, lon: number): Promise<WeatherData> {
     try {
       const response = await axios.get(
-        `${BASE_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        `${BASE_URL}/current.json?key=${API_KEY}&q=${lat},${lon}&aqi=no`
       );
 
       const data = response.data;
-      const temp = data.main.temp;
-      const humidity = data.main.humidity;
-      const windSpeed = data.wind.speed;
-      const description = data.weather[0].description;
-      const icon = data.weather[0].icon;
+      const current = data.current;
+      const location = data.location;
+      
+      const temp = current.temp_c;
+      const humidity = current.humidity;
+      const windSpeed = current.wind_kph;
+      const description = current.condition.text;
+      const icon = current.condition.icon;
 
       // Determine if weather is good for climbing
       const isGoodForClimbing = this.assessClimbingConditions(temp, humidity, windSpeed, description);
@@ -42,7 +46,7 @@ class WeatherService {
 
       return {
         temperature: temp,
-        feelsLike: data.main.feels_like,
+        feelsLike: current.feelslike_c,
         humidity,
         windSpeed,
         description,
@@ -105,15 +109,34 @@ class WeatherService {
 
   async getWeatherForCity(city: string): Promise<WeatherData> {
     try {
-      // First get coordinates for the city
-      const geoResponse = await axios.get(
-        `${BASE_URL}/weather?q=${city}&appid=${API_KEY}`
+      // WeatherAPI.com can handle city names directly
+      const response = await axios.get(
+        `${BASE_URL}/current.json?key=${API_KEY}&q=${encodeURIComponent(city)}&aqi=no`
       );
+
+      const data = response.data;
+      const current = data.current;
       
-      const lat = geoResponse.data.coord.lat;
-      const lon = geoResponse.data.coord.lon;
-      
-      return this.getWeatherData(lat, lon);
+      const temp = current.temp_c;
+      const humidity = current.humidity;
+      const windSpeed = current.wind_kph;
+      const description = current.condition.text;
+      const icon = current.condition.icon;
+
+      // Determine if weather is good for climbing
+      const isGoodForClimbing = this.assessClimbingConditions(temp, humidity, windSpeed, description);
+      const climbingRecommendation = this.getClimbingRecommendation(temp, humidity, windSpeed, description);
+
+      return {
+        temperature: temp,
+        feelsLike: current.feelslike_c,
+        humidity,
+        windSpeed,
+        description,
+        icon,
+        isGoodForClimbing,
+        climbingRecommendation,
+      };
     } catch (error) {
       console.error('Error fetching weather for city:', error);
       throw new Error('City not found or weather data unavailable');

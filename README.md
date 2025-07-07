@@ -61,13 +61,34 @@ A modern, sleek React Native app for tracking climbing sessions with detailed an
 
 ## 🔧 Configuration
 
+### Environment Setup
+
+1. **Copy the example environment file**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Configure your environment variables**
+   ```bash
+   # Weather API Configuration
+   WEATHER_API_KEY=your_weather_api_key_here
+   WEATHER_API_BASE_URL=http://api.weatherapi.com/v1
+   
+   # Backend API Configuration
+   BACKEND_API_URL=your_backend_url_here
+   ```
+
+3. **Get API Keys**
+   - **WeatherAPI.com**: Sign up at [weatherapi.com](https://www.weatherapi.com/) for a free API key (1,000,000 calls/month)
+   - **Backend**: Use your deployed backend URL
+
 ### Backend Connection
 
-Update the API base URL in `src/services/api.ts`:
+The app automatically uses the `BACKEND_API_URL` from your `.env` file. Update it to point to your backend:
 
 ```typescript
-  private baseUrl = 'https://ascend-api-production.up.railway.app'; // Production
-// private baseUrl = 'https://your-backend-url.com'; // Production
+// This is now handled by environment variables
+BACKEND_API_URL=https://ascend-api-production.up.railway.app
 ```
 
 ### Network Configuration
