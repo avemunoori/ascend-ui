@@ -66,9 +66,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      await apiService.createUser(email, password);
-      // After registration, log the user in
-      await login(email, password);
+      const { token } = await apiService.createUser(email, password);
+      await AsyncStorage.setItem('jwt_token', token);
+      const userData = await apiService.getCurrentUser();
+      setUser(userData);
     } catch (error) {
       console.error('Registration error:', error);
       throw error;

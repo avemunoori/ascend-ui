@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService } from '../services/api';
 import { Session } from '../types';
+import { useAuth } from './AuthContext';
 
 interface SessionsContextType {
   sessions: Session[];
@@ -25,9 +26,15 @@ interface SessionsProviderProps {
 
 export const SessionsProvider: React.FC<SessionsProviderProps> = ({ children }) => {
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   const refreshSessions = async () => {
+    if (!user) {
+      setSessions([]);
+      return;
+    }
+    
     try {
       setLoading(true);
       const data = await apiService.getSessions();
@@ -44,8 +51,12 @@ export const SessionsProvider: React.FC<SessionsProviderProps> = ({ children }) 
   };
 
   useEffect(() => {
-    refreshSessions();
-  }, []);
+    if (user) {
+      refreshSessions();
+    } else {
+      setSessions([]);
+    }
+  }, [user]);
 
   const value = {
     sessions,

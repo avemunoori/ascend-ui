@@ -9,18 +9,66 @@ import {
   Dimensions,
   Animated,
   Text,
+  TouchableOpacity,
 } from 'react-native';
 import {
   TextInput,
   Button,
   Card,
   Title,
+  IconButton,
 } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../theme/colors';
+import { apiService } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
+
+// Particle component for background effects
+const Particle = ({ style, delay = 0 }: { style: any; delay?: number }) => {
+  const particleAnim = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.timing(particleAnim, {
+          toValue: 1,
+          duration: 3000 + Math.random() * 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(particleAnim, {
+          toValue: 0,
+          duration: 3000 + Math.random() * 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const translateY = particleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -100 - Math.random() * 200],
+  });
+
+  const opacity = particleAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, 0.8, 0],
+  });
+
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          transform: [{ translateY }],
+          opacity,
+        },
+      ]}
+    />
+  );
+};
 
 const LoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -28,47 +76,58 @@ const LoginScreen: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
-  // Animation values
+  // Advanced animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const parallaxAnim = useRef(new Animated.Value(0)).current;
+  const formScaleAnim = useRef(new Animated.Value(0.9)).current;
+  const inputFocusAnim = useRef(new Animated.Value(0)).current;
+  const buttonPressAnim = useRef(new Animated.Value(1)).current;
+  const colorShiftAnim = useRef(new Animated.Value(0)).current;
 
   const { login, register } = useAuth();
 
   useEffect(() => {
-    // Entrance animations
+    // Enhanced entrance animations
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 1000,
+        duration: 1200,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 800,
+        duration: 1000,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(formScaleAnim, {
         toValue: 1,
         duration: 600,
         useNativeDriver: true,
       }),
     ]).start();
 
-    // Continuous animations
+    // Continuous advanced animations
     Animated.loop(
       Animated.sequence([
         Animated.timing(rotateAnim, {
           toValue: 1,
-          duration: 20000,
+          duration: 25000,
           useNativeDriver: true,
         }),
         Animated.timing(rotateAnim, {
           toValue: 0,
-          duration: 20000,
+          duration: 25000,
           useNativeDriver: true,
         }),
       ])
@@ -77,14 +136,30 @@ const LoginScreen: React.FC = () => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
-          toValue: 1.1,
-          duration: 2000,
+          toValue: 1.05,
+          duration: 3000,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 2000,
+          duration: 3000,
           useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Color shift animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(colorShiftAnim, {
+          toValue: 1,
+          duration: 8000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(colorShiftAnim, {
+          toValue: 0,
+          duration: 8000,
+          useNativeDriver: false,
         }),
       ])
     ).start();
@@ -101,6 +176,20 @@ const LoginScreen: React.FC = () => {
       return;
     }
 
+    // Button press animation
+    Animated.sequence([
+      Animated.timing(buttonPressAnim, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonPressAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     try {
       setIsLoading(true);
       if (isLogin) {
@@ -115,6 +204,36 @@ const LoginScreen: React.FC = () => {
     }
   };
 
+  const testBackendConnection = async () => {
+    try {
+      console.log('Testing backend connection...');
+      const health = await apiService.healthCheck();
+      console.log('Health check result:', health);
+      Alert.alert('Backend Status', `Health check: ${health}`);
+    } catch (error) {
+      console.error('Backend test failed:', error);
+      Alert.alert('Backend Error', error instanceof Error ? error.message : 'Connection failed');
+    }
+  };
+
+  const handleInputFocus = () => {
+    setIsFocused(true);
+    Animated.timing(inputFocusAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleInputBlur = () => {
+    setIsFocused(false);
+    Animated.timing(inputFocusAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -125,54 +244,101 @@ const LoginScreen: React.FC = () => {
     outputRange: ['0deg', '-360deg'],
   });
 
+  const colorShift = colorShiftAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  // Generate particles
+  const particles = Array.from({ length: 20 }, (_, i) => (
+    <Particle
+      key={i}
+      style={[
+        styles.particle,
+        {
+          left: Math.random() * width,
+          top: height + Math.random() * 100,
+          width: 2 + Math.random() * 4,
+          height: 2 + Math.random() * 4,
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+        },
+      ]}
+      delay={i * 200}
+    />
+  ));
+
   return (
     <View style={styles.container}>
-      {/* Animated Background Gradients */}
+      {/* Dynamic Background Gradients */}
       <LinearGradient
         colors={[colors.gradients.primary[0], colors.gradients.primary[1]]}
         style={styles.backgroundGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
+      
       <LinearGradient
         colors={[colors.gradients.secondary[0], colors.gradients.secondary[1]]}
-        style={[styles.backgroundGradient, { opacity: 0.3 }]}
+        style={[styles.backgroundGradient, { opacity: 0.4 }]}
         start={{ x: 1, y: 0 }}
         end={{ x: 0, y: 1 }}
       />
 
-      {/* Floating Elements */}
+      {/* Particle System */}
+      {particles}
+
+      {/* 3D Floating Elements with Parallax */}
       <Animated.View
         style={[
-          styles.floatingCircle,
-          styles.circle1,
+          styles.floatingElement,
+          styles.element1,
           {
             transform: [
               { rotate: spin },
               { scale: pulseAnim },
+              { translateY: parallaxAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -20],
+              }) },
             ],
           },
         ]}
-      />
+      >
+        <LinearGradient
+          colors={['rgba(59, 130, 246, 0.3)', 'rgba(139, 92, 246, 0.1)']}
+          style={styles.floatingGradient}
+        />
+      </Animated.View>
+
       <Animated.View
         style={[
-          styles.floatingCircle,
-          styles.circle2,
+          styles.floatingElement,
+          styles.element2,
           {
-                         transform: [
-               { rotate: spinReverse },
-               { scale: pulseAnim.interpolate({
-                 inputRange: [0, 1],
-                 outputRange: [1, 0.8],
-               }) },
-             ],
+            transform: [
+              { rotate: spinReverse },
+              { scale: pulseAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0.8],
+              }) },
+              { translateY: parallaxAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 15],
+              }) },
+            ],
           },
         ]}
-      />
+      >
+        <LinearGradient
+          colors={['rgba(236, 72, 153, 0.2)', 'rgba(59, 130, 246, 0.1)']}
+          style={styles.floatingGradient}
+        />
+      </Animated.View>
+
       <Animated.View
         style={[
-          styles.floatingCircle,
-          styles.circle3,
+          styles.floatingElement,
+          styles.element3,
           {
             transform: [
               { rotate: spin },
@@ -180,17 +346,29 @@ const LoginScreen: React.FC = () => {
                 inputRange: [0, 1],
                 outputRange: [0.8, 1.2],
               }) },
+              { translateY: parallaxAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, -30],
+              }) },
             ],
           },
         ]}
-      />
+      >
+        <LinearGradient
+          colors={['rgba(16, 185, 129, 0.25)', 'rgba(59, 130, 246, 0.1)']}
+          style={styles.floatingGradient}
+        />
+      </Animated.View>
 
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          {/* Header Section */}
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer} 
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Enhanced Header Section */}
           <Animated.View 
             style={[
               styles.header,
@@ -204,7 +382,20 @@ const LoginScreen: React.FC = () => {
             ]}
           >
             <Animated.View style={[styles.logoContainer, { transform: [{ scale: pulseAnim }] }]}>
-              <Text style={styles.logo}>🧗‍♀️</Text>
+              <View style={styles.logoWrapper}>
+                <Text style={styles.logo}>🧗‍♀️</Text>
+                <Animated.View
+                  style={[
+                    styles.logoGlow,
+                    {
+                      opacity: pulseAnim.interpolate({
+                        inputRange: [1, 1.05],
+                        outputRange: [0.3, 0.6],
+                      }),
+                    },
+                  ]}
+                />
+              </View>
               <Text style={styles.brandName}>ASCEND</Text>
             </Animated.View>
             <Text style={styles.tagline}>
@@ -212,7 +403,7 @@ const LoginScreen: React.FC = () => {
             </Text>
           </Animated.View>
 
-          {/* Glassmorphism Form Card */}
+          {/* Glassmorphism 2.0 Form Card */}
           <Animated.View
             style={[
               styles.formCardContainer,
@@ -223,97 +414,137 @@ const LoginScreen: React.FC = () => {
                     inputRange: [0, 50],
                     outputRange: [0, 30],
                   }) },
-                  { scale: scaleAnim },
+                  { scale: formScaleAnim },
                 ],
               },
             ]}
           >
-            <Card style={styles.formCard}>
-              <Card.Content style={styles.formContent}>
+            <View style={styles.glassmorphismCard}>
+              <View style={styles.cardContent}>
                 <Title style={styles.formTitle}>
                   {isLogin ? 'Sign In' : 'Create Account'}
                 </Title>
                 
                 <View style={styles.inputContainer}>
-                  <TextInput
-                    label="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    mode="outlined"
-                    style={styles.input}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    outlineColor="rgba(255, 255, 255, 0.3)"
-                    activeOutlineColor="white"
-                    theme={{
-                      colors: {
-                        placeholder: 'rgba(255, 255, 255, 0.7)',
-                        text: 'white',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                      },
-                    }}
-                  />
+                  <Animated.View style={[
+                    styles.inputWrapper,
+                    {
+                      transform: [{ scale: inputFocusAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.02],
+                      }) }],
+                    },
+                  ]}>
+                    <TextInput
+                      label="Email"
+                      value={email}
+                      onChangeText={setEmail}
+                      mode="outlined"
+                      style={styles.input}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
+                      outlineColor="rgba(255, 255, 255, 0.3)"
+                      activeOutlineColor="white"
+                      theme={{
+                        colors: {
+                          placeholder: 'rgba(255, 255, 255, 0.7)',
+                          text: 'white',
+                          background: 'rgba(255, 255, 255, 0.1)',
+                        },
+                      }}
+                    />
+                  </Animated.View>
 
-                  <TextInput
-                    label="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    mode="outlined"
-                    style={styles.input}
-                    secureTextEntry={!showPassword}
-                    outlineColor="rgba(255, 255, 255, 0.3)"
-                    activeOutlineColor="white"
-                                          right={
+                  <Animated.View style={[
+                    styles.inputWrapper,
+                    {
+                      transform: [{ scale: inputFocusAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.02],
+                      }) }],
+                    },
+                  ]}>
+                    <TextInput
+                      label="Password"
+                      value={password}
+                      onChangeText={setPassword}
+                      mode="outlined"
+                      style={styles.input}
+                      secureTextEntry={!showPassword}
+                      onFocus={handleInputFocus}
+                      onBlur={handleInputBlur}
+                      outlineColor="rgba(255, 255, 255, 0.3)"
+                      activeOutlineColor="white"
+                      right={
                         <TextInput.Icon
                           icon={showPassword ? 'eye-off' : 'eye'}
                           onPress={() => setShowPassword(!showPassword)}
+                          color="rgba(255, 255, 255, 0.7)"
                         />
                       }
-                    theme={{
-                      colors: {
-                        placeholder: 'rgba(255, 255, 255, 0.7)',
-                        text: 'white',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                      },
-                    }}
-                  />
+                      theme={{
+                        colors: {
+                          placeholder: 'rgba(255, 255, 255, 0.7)',
+                          text: 'white',
+                          background: 'rgba(255, 255, 255, 0.1)',
+                        },
+                      }}
+                    />
+                  </Animated.View>
                 </View>
 
-                <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-                  <Button
-                    mode="contained"
+                <Animated.View style={{ 
+                  transform: [
+                    { scale: buttonPressAnim },
+                    { scale: pulseAnim.interpolate({
+                      inputRange: [1, 1.05],
+                      outputRange: [1, 1.02],
+                    }) },
+                  ] 
+                }}>
+                  <TouchableOpacity
                     onPress={handleSubmit}
                     style={styles.submitButton}
-                    loading={isLoading}
                     disabled={isLoading}
-                    buttonColor="white"
-                    textColor={colors.primary}
-                    labelStyle={styles.submitButtonLabel}
+                    activeOpacity={0.8}
                   >
-                    {isLogin ? 'Sign In' : 'Create Account'}
-                  </Button>
+                    <LinearGradient
+                      colors={[colors.gradients.primary[0], colors.gradients.primary[1]]}
+                      style={styles.submitGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    >
+                      <Text style={styles.submitButtonText}>
+                        {isLoading ? 'Loading...' : (isLogin ? 'Sign In' : 'Create Account')}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
                 </Animated.View>
+
+
 
                 <View style={styles.switchContainer}>
                   <Text style={styles.switchText}>
                     {isLogin ? "Don't have an account? " : 'Already have an account? '}
                   </Text>
-                  <Button
-                    mode="text"
+                  <TouchableOpacity
                     onPress={() => setIsLogin(!isLogin)}
                     style={styles.switchButton}
-                    textColor="white"
-                    labelStyle={styles.switchButtonLabel}
+                    activeOpacity={0.7}
                   >
-                    {isLogin ? 'Sign Up' : 'Sign In'}
-                  </Button>
+                    <Text style={styles.switchButtonText}>
+                      {isLogin ? 'Sign Up' : 'Sign In'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              </Card.Content>
-            </Card>
+              </View>
+            </View>
           </Animated.View>
 
-          {/* Features Section */}
+          {/* Enhanced Features Section */}
           <Animated.View 
             style={[
               styles.featuresContainer,
@@ -326,18 +557,24 @@ const LoginScreen: React.FC = () => {
             <Text style={styles.featuresTitle}>Why Ascend?</Text>
             <View style={styles.featuresGrid}>
               <Animated.View style={[styles.featureItem, { transform: [{ scale: pulseAnim }] }]}>
-                <Text style={styles.featureIcon}>📊</Text>
+                <View style={styles.featureIconContainer}>
+                  <Text style={styles.featureIcon}>📊</Text>
+                </View>
                 <Text style={styles.featureText}>Track Progress</Text>
               </Animated.View>
               <Animated.View style={[styles.featureItem, { transform: [{ scale: pulseAnim.interpolate({
                 inputRange: [0, 1],
                 outputRange: [1, 1.1],
               }) }] }]}>
-                <Text style={styles.featureIcon}>🎯</Text>
+                <View style={styles.featureIconContainer}>
+                  <Text style={styles.featureIcon}>🎯</Text>
+                </View>
                 <Text style={styles.featureText}>Set Goals</Text>
               </Animated.View>
               <Animated.View style={[styles.featureItem, { transform: [{ scale: pulseAnim }] }]}>
-                <Text style={styles.featureIcon}>🏆</Text>
+                <View style={styles.featureIconContainer}>
+                  <Text style={styles.featureIcon}>🏆</Text>
+                </View>
                 <Text style={styles.featureText}>Celebrate Wins</Text>
               </Animated.View>
             </View>
@@ -360,30 +597,39 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  floatingCircle: {
+  floatingElement: {
     position: 'absolute',
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-  },
-  circle1: {
     width: 200,
     height: 200,
-    top: -50,
-    right: -50,
+    borderRadius: 100,
+    opacity: 0.8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    overflow: 'hidden',
   },
-  circle2: {
-    width: 150,
-    height: 150,
-    bottom: 100,
-    left: -30,
+  element1: {
+    top: height * 0.2,
+    left: width * 0.3,
+    backgroundColor: 'transparent',
   },
-  circle3: {
-    width: 100,
-    height: 100,
-    top: height * 0.3,
-    right: 50,
+  element2: {
+    bottom: height * 0.4,
+    right: width * 0.2,
+    backgroundColor: 'transparent',
+  },
+  element3: {
+    top: height * 0.6,
+    right: width * 0.4,
+    backgroundColor: 'transparent',
+  },
+  floatingGradient: {
+    flex: 1,
+    borderRadius: 100,
+    opacity: 0.5,
+  },
+  particle: {
+    position: 'absolute',
+    borderRadius: 5,
   },
   keyboardContainer: {
     flex: 1,
@@ -402,9 +648,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  logoWrapper: {
+    position: 'relative',
+  },
   logo: {
     fontSize: 80,
     marginBottom: 8,
+  },
+  logoGlow: {
+    position: 'absolute',
+    top: -10,
+    left: -10,
+    right: -10,
+    bottom: -10,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   brandName: {
     fontSize: 36,
@@ -424,65 +684,94 @@ const styles = StyleSheet.create({
   formCardContainer: {
     marginBottom: 32,
   },
-  formCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  glassmorphismCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 24,
-    elevation: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    elevation: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
   },
-  formContent: {
+  cardContent: {
     padding: 32,
   },
   formTitle: {
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 40,
     color: 'white',
     fontSize: 28,
     fontWeight: '700',
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: 32,
+  },
+  inputWrapper: {
+    position: 'relative',
+    marginBottom: 20,
   },
   input: {
-    marginBottom: 16,
     borderRadius: 12,
   },
   submitButton: {
     marginTop: 8,
     marginBottom: 16,
-    paddingVertical: 16,
     borderRadius: 16,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+    overflow: 'hidden',
   },
-  submitButtonLabel: {
+  submitGradient: {
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  submitButtonText: {
+    color: 'white',
     fontSize: 18,
     fontWeight: '700',
+    textAlign: 'center',
+  },
+  testButton: {
+    marginTop: 8,
+    marginBottom: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    alignItems: 'center',
+  },
+  testButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     flexWrap: 'wrap',
+    marginTop: 8,
   },
   switchText: {
     color: 'rgba(255, 255, 255, 0.8)',
     fontSize: 14,
   },
   switchButton: {
-    marginLeft: -8,
+    marginLeft: 4,
   },
-  switchButtonLabel: {
+  switchButtonText: {
+    color: 'white',
     fontSize: 14,
     fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   featuresContainer: {
     alignItems: 'center',
@@ -505,9 +794,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  featureIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   featureIcon: {
     fontSize: 40,
-    marginBottom: 8,
   },
   featureText: {
     fontSize: 14,

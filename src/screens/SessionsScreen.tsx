@@ -8,6 +8,7 @@ import {
   Dimensions,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {
   Card,
@@ -21,14 +22,16 @@ import {
 } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useSessions } from '../contexts/SessionsContext';
 import { colors } from '../theme/colors';
-import { Session, SessionDiscipline } from '../types';
+import { Session, SessionDiscipline, RootStackParamList } from '../types';
+import { apiService } from '../services/api';
 
 const { width, height } = Dimensions.get('window');
 
 const SessionsScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { sessions, loading, refreshSessions } = useSessions();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'bouldering' | 'lead'>('all');
@@ -84,6 +87,28 @@ const SessionsScreen: React.FC = () => {
     setRefreshing(false);
   };
 
+  const handleDeleteSession = async (sessionId: string) => {
+    Alert.alert(
+      'Delete Session',
+      'Are you sure you want to delete this session?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await apiService.deleteSession(sessionId);
+              await refreshSessions();
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete session');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const filteredSessions = sessions.filter(session => {
     const matchesSearch = session.grade.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          session.notes?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -112,9 +137,9 @@ const SessionsScreen: React.FC = () => {
     }
   };
 
-  const headerHeight = scrollY.interpolate({
+  const headerScale = scrollY.interpolate({
     inputRange: [0, 200],
-    outputRange: [200, 100],
+    outputRange: [1, 0.8],
     extrapolate: 'clamp',
   });
 
@@ -140,7 +165,7 @@ const SessionsScreen: React.FC = () => {
       />
 
       {/* Animated Header */}
-      <Animated.View style={[styles.header, { height: headerHeight, opacity: headerOpacity }]}>
+      <Animated.View style={[styles.header, { opacity: headerOpacity, transform: [{ scale: headerScale }] }]}>
         <LinearGradient
           colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
           style={styles.headerGradient}
@@ -167,7 +192,7 @@ const SessionsScreen: React.FC = () => {
         }
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
@@ -236,7 +261,7 @@ const SessionsScreen: React.FC = () => {
               {!searchQuery && selectedFilter === 'all' && (
                 <Button
                   mode="contained"
-                  onPress={() => navigation.navigate('AddSession' as never)}
+                  onPress={() => navigation.navigate('AddSession')}
                   style={styles.emptyButton}
                   buttonColor="white"
                   textColor={colors.primary}
@@ -262,7 +287,6 @@ const SessionsScreen: React.FC = () => {
               >
                                  <TouchableOpacity
                    onPress={() => {
-                     // @ts-ignore
                      navigation.navigate('SessionDetail', { sessionId: session.id });
                    }}
                    activeOpacity={0.8}
@@ -290,11 +314,20 @@ const SessionsScreen: React.FC = () => {
                                {session.discipline}
                              </Chip>
                            </View>
-                           <IconButton
-                             icon="chevron-right"
-                             iconColor="rgba(255, 255, 255, 0.7)"
-                             size={24}
-                           />
+                           <View style={styles.cardActions}>
+                             <IconButton
+                               icon="pencil"
+                               iconColor="rgba(255, 255, 255, 0.7)"
+                               size={20}
+                               onPress={() => navigation.navigate('SessionDetail', { sessionId: session.id })}
+                             />
+                             <IconButton
+                               icon="delete"
+                               iconColor="rgba(255, 255, 255, 0.7)"
+                               size={20}
+                               onPress={() => handleDeleteSession(session.id)}
+                             />
+                           </View>
                          </View>
 
                          <View style={styles.cardStats}>
@@ -341,7 +374,7 @@ const SessionsScreen: React.FC = () => {
         <FAB
           icon="plus"
           style={styles.fab}
-          onPress={() => navigation.navigate('AddSession' as never)}
+          onPress={() => navigation.navigate('AddSession')}
           color={colors.primary}
         />
       </Animated.View>
@@ -470,6 +503,10 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   typeChip: {
     alignSelf: 'flex-start',

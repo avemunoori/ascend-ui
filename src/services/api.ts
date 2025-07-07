@@ -26,45 +26,78 @@ class ApiService {
   
   // Authentication
   async login(email: string, password: string): Promise<JwtResponse> {
-    const response = await fetch(`${this.baseUrl}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Login failed: ${response.status} - ${errorText}`);
+    console.log('Attempting login for:', email);
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      console.log('Login response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Login failed:', response.status, errorText);
+        throw new Error(`Login failed: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Login successful, token received');
+      return result;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-    
-    return response.json();
   }
   
   async validateToken(): Promise<User> {
-    const response = await fetch(`${this.baseUrl}/auth/validate`, {
-      headers: await this.getHeaders(),
-    });
-    
-    if (!response.ok) {
-      throw new Error('Invalid token');
+    console.log('Validating token...');
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/validate`, {
+        headers: await this.getHeaders(),
+      });
+      
+      console.log('Token validation status:', response.status);
+      
+      if (!response.ok) {
+        console.error('Token validation failed:', response.status);
+        throw new Error('Invalid token');
+      }
+      
+      const result = await response.json();
+      console.log('Token validation successful');
+      return result;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      throw error;
     }
-    
-    return response.json();
   }
   
-  async createUser(email: string, password: string): Promise<User> {
-    const response = await fetch(`${this.baseUrl}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to create user: ${response.status} - ${errorText}`);
+  async createUser(email: string, password: string): Promise<JwtResponse> {
+    console.log('Attempting user registration for:', email);
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      console.log('Registration response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Registration failed:', response.status, errorText);
+        throw new Error(`Failed to create user: ${response.status} - ${errorText}`);
+      }
+      
+      const result = await response.json();
+      console.log('Registration successful, token received');
+      return result;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
     }
-    
-    return response.json();
   }
   
   async getCurrentUser(): Promise<User> {

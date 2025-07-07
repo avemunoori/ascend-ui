@@ -11,6 +11,7 @@ import { colors } from '../theme/colors';
 import LoginScreen from '../screens/LoginScreen';
 import SessionsScreen from '../screens/SessionsScreen';
 import AddSessionScreen from '../screens/AddSessionScreen';
+import SessionDetailScreen from '../screens/SessionDetailScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
@@ -140,7 +141,10 @@ const AppNavigator: React.FC = () => {
         }}
       >
         {user ? (
-          <Stack.Screen name="Main" component={MainTabNavigator} />
+          <>
+            <Stack.Screen name="Main" component={MainTabNavigator} />
+            <Stack.Screen name="SessionDetail" component={SessionDetailScreen} />
+          </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
         )}

@@ -16,8 +16,10 @@ import {
   Button,
   ProgressBar,
 } from 'react-native-paper';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SessionAnalytics, ProgressAnalytics, HighestGrades, AverageGrades, SessionDiscipline } from '../types';
 import { apiService } from '../services/api';
+import { colors } from '../theme/colors';
 
 const { width } = Dimensions.get('window');
 
@@ -98,23 +100,28 @@ const AnalyticsScreen: React.FC = () => {
 
     return (
       <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.cardTitle}>Overview</Title>
-          <View style={styles.overviewGrid}>
-            <View style={styles.overviewItem}>
-              <Text style={styles.overviewNumber}>{analytics.totalSessions}</Text>
-              <Text style={styles.overviewLabel}>Total Sessions</Text>
+        <LinearGradient
+          colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
+          style={styles.cardGradient}
+        >
+          <Card.Content>
+            <Title style={styles.cardTitle}>📊 Overview</Title>
+            <View style={styles.overviewGrid}>
+              <View style={styles.overviewItem}>
+                <Text style={styles.overviewNumber}>{analytics.totalSessions}</Text>
+                <Text style={styles.overviewLabel}>Total Sessions</Text>
+              </View>
+              <View style={styles.overviewItem}>
+                <Text style={styles.overviewNumber}>{formatGrade(analytics.averageDifficulty)}</Text>
+                <Text style={styles.overviewLabel}>Avg Difficulty</Text>
+              </View>
+              <View style={styles.overviewItem}>
+                <Text style={styles.overviewNumber}>{(analytics.sentPercentage * 100).toFixed(1)}%</Text>
+                <Text style={styles.overviewLabel}>Sent Rate</Text>
+              </View>
             </View>
-            <View style={styles.overviewItem}>
-              <Text style={styles.overviewNumber}>{formatGrade(analytics.averageDifficulty)}</Text>
-              <Text style={styles.overviewLabel}>Avg Difficulty</Text>
-            </View>
-            <View style={styles.overviewItem}>
-              <Text style={styles.overviewNumber}>{(analytics.sentPercentage * 100).toFixed(1)}%</Text>
-              <Text style={styles.overviewLabel}>Sent Rate</Text>
-            </View>
-          </View>
-        </Card.Content>
+          </Card.Content>
+        </LinearGradient>
       </Card>
     );
   };
@@ -124,26 +131,31 @@ const AnalyticsScreen: React.FC = () => {
 
     return (
       <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.cardTitle}>Sessions by Discipline</Title>
-          {Object.entries(analytics.sessionsByDiscipline).map(([discipline, count]) => (
-            <View key={discipline} style={styles.disciplineRow}>
-              <View style={styles.disciplineInfo}>
-                <Chip
-                  mode="outlined"
-                  style={[styles.disciplineChip, { borderColor: getDisciplineColor(discipline as SessionDiscipline) }]}
-                  textStyle={{ color: getDisciplineColor(discipline as SessionDiscipline) }}
-                >
-                  {getDisciplineLabel(discipline as SessionDiscipline)}
-                </Chip>
-                <Text style={styles.disciplineCount}>{count} sessions</Text>
+        <LinearGradient
+          colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
+          style={styles.cardGradient}
+        >
+          <Card.Content>
+            <Title style={styles.cardTitle}>🧗‍♀️ Sessions by Discipline</Title>
+            {Object.entries(analytics.sessionsByDiscipline).map(([discipline, count]) => (
+              <View key={discipline} style={styles.disciplineRow}>
+                <View style={styles.disciplineInfo}>
+                  <Chip
+                    mode="outlined"
+                    style={[styles.disciplineChip, { borderColor: getDisciplineColor(discipline as SessionDiscipline) }]}
+                    textStyle={{ color: getDisciplineColor(discipline as SessionDiscipline) }}
+                  >
+                    {getDisciplineLabel(discipline as SessionDiscipline)}
+                  </Chip>
+                  <Text style={styles.disciplineCount}>{count} sessions</Text>
+                </View>
+                <Text style={styles.disciplinePercentage}>
+                  {((count / analytics.totalSessions) * 100).toFixed(1)}%
+                </Text>
               </View>
-              <Text style={styles.disciplinePercentage}>
-                {((count / analytics.totalSessions) * 100).toFixed(1)}%
-              </Text>
-            </View>
-          ))}
-        </Card.Content>
+            ))}
+          </Card.Content>
+        </LinearGradient>
       </Card>
     );
   };
@@ -231,23 +243,40 @@ const AnalyticsScreen: React.FC = () => {
 
     return (
       <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.cardTitle}>Recent Progress</Title>
-          <View style={styles.progressGrid}>
-            <View style={styles.progressItem}>
-              <Text style={styles.progressNumber}>{progressAnalytics.totalSessions}</Text>
-              <Text style={styles.progressLabel}>Total Sessions</Text>
+        <LinearGradient
+          colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
+          style={styles.cardGradient}
+        >
+          <Card.Content>
+            <Title style={styles.cardTitle}>📈 Progress Insights</Title>
+            <View style={styles.progressGrid}>
+              <View style={styles.progressItem}>
+                <Text style={styles.progressNumber}>{progressAnalytics.totalSessions}</Text>
+                <Text style={styles.progressLabel}>Total Sessions</Text>
+              </View>
+              <View style={styles.progressItem}>
+                <Text style={styles.progressNumber}>{(progressAnalytics.sentRate * 100).toFixed(1)}%</Text>
+                <Text style={styles.progressLabel}>Success Rate</Text>
+              </View>
+              <View style={styles.progressItem}>
+                <Text style={styles.progressNumber}>{formatGrade(progressAnalytics.avgDifficulty)}</Text>
+                <Text style={styles.progressLabel}>Avg Difficulty</Text>
+              </View>
             </View>
-            <View style={styles.progressItem}>
-              <Text style={styles.progressNumber}>{(progressAnalytics.sentRate * 100).toFixed(1)}%</Text>
-              <Text style={styles.progressLabel}>Overall Sent Rate</Text>
+            
+            {/* Progress Motivation */}
+            <View style={styles.motivationContainer}>
+              <Text style={styles.motivationText}>
+                {progressAnalytics.sentRate > 0.7 
+                  ? "🔥 You're crushing it! Keep pushing your limits!"
+                  : progressAnalytics.sentRate > 0.5
+                  ? "💪 Great progress! Focus on technique and consistency."
+                  : "🎯 Every session counts! Focus on fundamentals and build confidence."
+                }
+              </Text>
             </View>
-            <View style={styles.progressItem}>
-              <Text style={styles.progressNumber}>{formatGrade(progressAnalytics.avgDifficulty)}</Text>
-              <Text style={styles.progressLabel}>Avg Difficulty</Text>
-            </View>
-          </View>
-        </Card.Content>
+          </Card.Content>
+        </LinearGradient>
       </Card>
     );
   };
@@ -262,30 +291,64 @@ const AnalyticsScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.scrollContainer}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      {renderOverviewCard()}
-      {renderDisciplineBreakdown()}
-      {renderDifficultyBreakdown()}
-      {renderSentRateBreakdown()}
-      {renderHighestGrades()}
-      {renderProgressData()}
-    </ScrollView>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[colors.gradients.primary[0], colors.gradients.primary[1]]}
+        style={styles.backgroundGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            tintColor="white"
+            colors={['white']}
+          />
+        }
+      >
+        <Title style={styles.pageTitle}>Analytics Dashboard</Title>
+        {renderOverviewCard()}
+        {renderDisciplineBreakdown()}
+        {renderDifficultyBreakdown()}
+        {renderSentRateBreakdown()}
+        {renderHighestGrades()}
+        {renderProgressData()}
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    position: 'relative',
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  scrollView: {
+    flex: 1,
   },
   scrollContainer: {
     padding: 16,
+  },
+  pageTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: 'white',
+    marginBottom: 24,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
   },
   loadingContainer: {
     flex: 1,
@@ -300,14 +363,22 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: 16,
-    elevation: 2,
-    borderRadius: 12,
+    elevation: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  cardGradient: {
+    borderRadius: 16,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 20,
+    fontWeight: '800',
+    color: 'white',
     marginBottom: 16,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   overviewGrid: {
     flexDirection: 'row',
@@ -318,14 +389,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overviewNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 28,
+    fontWeight: '900',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   overviewLabel: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 4,
+    fontWeight: '600',
   },
   disciplineRow: {
     flexDirection: 'row',
@@ -344,12 +419,16 @@ const styles = StyleSheet.create({
   },
   disciplineCount: {
     fontSize: 14,
-    color: '#34495e',
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
   },
   disciplinePercentage: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#2c3e50',
+    fontWeight: '700',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   difficultyRow: {
     marginBottom: 16,
@@ -361,12 +440,16 @@ const styles = StyleSheet.create({
   },
   difficultyLabel: {
     fontSize: 14,
-    color: '#34495e',
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
   },
   difficultyValue: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#2c3e50',
+    fontWeight: '700',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   progressBar: {
     height: 6,
@@ -382,12 +465,16 @@ const styles = StyleSheet.create({
   },
   sentRateLabel: {
     fontSize: 14,
-    color: '#34495e',
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '600',
   },
   sentRateValue: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#2c3e50',
+    fontWeight: '700',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   highestGradesGrid: {
     flexDirection: 'row',
@@ -399,12 +486,17 @@ const styles = StyleSheet.create({
   },
   highestGradeLabel: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: 'rgba(255, 255, 255, 0.8)',
     marginBottom: 4,
+    fontWeight: '600',
   },
   highestGradeValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '900',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   progressGrid: {
     flexDirection: 'row',
@@ -415,15 +507,34 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   progressNumber: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 28,
+    fontWeight: '900',
+    color: 'white',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   progressLabel: {
     fontSize: 12,
-    color: '#7f8c8d',
+    color: 'rgba(255, 255, 255, 0.8)',
     marginTop: 4,
     textAlign: 'center',
+    fontWeight: '600',
+  },
+  motivationContainer: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  motivationText: {
+    fontSize: 14,
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: '600',
+    lineHeight: 20,
   },
 });
 
